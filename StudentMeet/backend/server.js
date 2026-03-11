@@ -241,15 +241,16 @@ app.delete('/api/requests/:id', auth, (req, res) => {
 /* ===============================
    9. EMAIL FUNCTION
 ================================ */
-
 async function sendEmails(data) {
+
     console.log("Sending client email to:", data.email);
+
     try {
 
-        // Admin email
+        // ADMIN EMAIL (Resend)
         await resend.emails.send({
             from: "StudentMeet <onboarding@resend.dev>",
-            to: [process.env.ADMIN_EMAIL],
+            to: process.env.ADMIN_EMAIL,
             subject: "New Project Request",
             text: `
 Name: ${data.name}
@@ -261,32 +262,27 @@ Deadline: ${data.deadline}
 `
         });
 
-        // Client confirmation
-        await resend.emails.send({
-            from: "StudentMeet <onboarding@resend.dev>",
-            to: [data.email],
+        // CLIENT EMAIL (GMAIL SMTP)
+        await transporter.sendMail({
+            from: `"StudentMeet Team" <${process.env.EMAIL_USER}>`,
+            to: data.email,
             subject: "StudentMeet - Request Received",
             text: `
 Hello ${data.name},
 
 Your project request has been received.
-Project Title: ${data.projectTitle}
+
+Project: ${data.projectTitle}
+
+We will contact you soon.
 
 StudentMeet Team
 `
         });
 
-        console.log("✅ Emails sent successfully");
+        console.log("Emails sent successfully");
 
     } catch (error) {
-        console.error("❌ Email sending failed:", error);
+        console.error("Email error:", error);
     }
 }
-/* ===============================
-   10. SERVER START
-================================ */
-
-app.listen(PORT, () => {
-    console.log(`🚀 Server starting...`);
-    console.log(`📍 Server running on port ${PORT}`);
-});
