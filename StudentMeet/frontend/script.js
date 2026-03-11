@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "/api";
 
 // 0. Mobile Menu Toggle
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -61,7 +61,7 @@ if (requestForm) {
             btn.disabled = true;
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Submitting...";
             msg.innerHTML = "Processing your request...";
-            
+
             // Task 1: Ensure Fetch API usage and correct endpoint
             const res = await fetch(`${API_BASE}/requests`, {
                 method: 'POST',
@@ -159,10 +159,10 @@ async function renderDashboard() {
         }
 
         const data = await res.json();
-        
+
         const stats = document.getElementById('requestStats');
         if (stats) stats.textContent = `${data.length} Total Requests`;
-        
+
         if (data.length === 0) {
             grid.innerHTML = `<div class="text-center w-full" style="grid-column: 1/-1; padding: 2rem; color: var(--text-muted);"><i class="fas fa-folder-open" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i> No project requests yet.</div>`;
             return;
