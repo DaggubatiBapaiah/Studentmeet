@@ -1,20 +1,5 @@
 [
   {
-    "_id": "1773246430817",
-    "name": " daggubati bapaiah chowdary",
-    "email": "babidaggubati13@gmail.com",
-    "whatsapp": "898885614565",
-    "projectTitle": "cdcd",
-    "projectCategory": "Software",
-    "projectDescription": "dscds",
-    "budget": "1000-2000",
-    "deadline": "20263-05-05",
-    "fileName": null,
-    "fileUrl": null,
-    "status": "pending",
-    "createdAt": "2026-03-11T16:27:10.817Z"
-  },
-  {
     "_id": "1773246236489",
     "name": "Jane Doe",
     "email": "jane.doe@example.com",

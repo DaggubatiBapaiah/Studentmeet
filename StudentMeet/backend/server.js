@@ -53,8 +53,19 @@ app.use((req, res, next) => {
     next();
 });
 
+// Serve static files (Images, CSS, JS)
 app.use('/uploads', express.static(uploadDir));
 app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Landing Page Route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
+// Health Check Endpoint (for Monitoring/Render)
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', uptime: process.uptime() });
+});
 
 /* ===============================
    3. FILE UPLOAD (MULTER)
@@ -282,8 +293,13 @@ StudentMeet Team
 }
 
 /* ===============================
-   10. SERVER START
+   11. ERROR HANDLING & START
 ================================ */
+
+app.use((err, req, res, next) => {
+    console.error("🔥 Global Server Error:", err);
+    res.status(500).json({ success: false, error: "Something went wrong on the server" });
+});
 
 app.listen(PORT, () => {
     console.log(`🚀 Server starting...`);
