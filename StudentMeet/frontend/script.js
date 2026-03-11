@@ -1,6 +1,4 @@
-const API_BASE = window.location.origin === "http://localhost:5000" || window.location.hostname === "127.0.0.1" 
-    ? "/api" 
-    : "https://studentmeet.onrender.com/api";
+const API_BASE = "https://studentmeet.onrender.com/api";
 
 // 0. Mobile Menu Toggle
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
@@ -59,51 +57,32 @@ if (requestForm) {
         const msg = document.getElementById('statusMessage');
         const formData = new FormData(requestForm);
 
-        // Basic Frontend Validation
-        const requiredFields = ['name', 'email', 'whatsapp', 'projectTitle', 'projectCategory', 'projectDescription', 'budget', 'deadline'];
-        for (const field of requiredFields) {
-            if (!formData.get(field)) {
-                msg.innerHTML = `<span class="text-danger">❌ Please fill in all required fields.</span>`;
-                return;
-            }
-        }
-
         try {
-            // Prevent multiple submissions
-            if (btn.disabled) return;
-            
             btn.disabled = true;
             btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Submitting...";
             msg.innerHTML = "Processing your request...";
 
-            // Use AbortController for timeout (e.g. 10 seconds)
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+            // Task 1: Ensure Fetch API usage and correct endpoint
             const res = await fetch(`${API_BASE}/requests`, {
                 method: 'POST',
-                body: formData,
-                signal: controller.signal
+                body: formData // Automatically sets correct multipart/form-data boundary
             });
 
-            clearTimeout(timeoutId);
             const data = await res.json();
 
             if (res.ok && data.success) {
-                msg.innerHTML = `<span style="color: #2ecc71; font-weight: 600;">✅ Project request submitted successfully!</span>`;
+                // Task 7: Show specific success message
+                msg.innerHTML = `<span style="color: #2ecc71; font-weight: 600;">✅ Project request submitted successfully.</span>`;
                 requestForm.reset();
-                // Optional: Scroll to message
-                msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    alert("Success! Check your email for confirmation.");
+                }, 500);
             } else {
                 msg.innerHTML = `<span class="text-danger">❌ ${data.message || 'Submission failed.'}</span>`;
             }
         } catch (err) {
             console.error("Frontend Submission Error:", err);
-            if (err.name === 'AbortError') {
-                msg.innerHTML = `<span class="text-danger">❌ Request timed out. Please try again.</span>`;
-            } else {
-                msg.innerHTML = `<span class="text-danger">❌ Connection failed. Check if server is running.</span>`;
-            }
+            msg.innerHTML = `<span class="text-danger">❌ Server connection failed. Please ensure backend is running.</span>`;
         } finally {
             btn.disabled = false;
             btn.innerHTML = "Submit Request";
