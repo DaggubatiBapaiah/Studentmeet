@@ -1,9 +1,10 @@
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
+const path = require('path'); 0
 const multer = require('multer');
-const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const mongoose = require('mongoose');
@@ -86,26 +87,7 @@ const upload = multer({ storage });
 
 
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
-/* Confirm email server connection */
-transporter.verify(function (error, success) {
-    if (error) {
-        console.error("SMTP error:", error);
-    } else {
-        console.log("SMTP server ready to send emails");
-    }
-});
+
 
 /* ===============================
    5. ADMIN AUTH MIDDLEWARE
@@ -261,19 +243,13 @@ app.delete('/api/requests/:id', auth, (req, res) => {
 ================================ */
 
 async function sendEmails(data) {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.warn("⚠️ Email credentials missing");
-        return;
-    }
-
-    const adminEmail = process.env.EMAIL_USER;
-
-    // Admin Notification
     try {
-        await transporter.sendMail({
-            from: `"StudentMeet Admin" <${process.env.EMAIL_USER}>`,
-            to: adminEmail,
-            subject: "New Project Request Received",
+
+        // Admin email
+        await resend.emails.send({
+            from: "StudentMeet <onboarding@resend.dev>",
+            to: process.env.ADMIN_EMAIL,
+            subject: "New Project Request",
             text: `
 Name: ${data.name}
 Email: ${data.email}
@@ -283,34 +259,28 @@ Budget: ${data.budget}
 Deadline: ${data.deadline}
 `
         });
-        console.log("📧 Admin email sent successfully");
-    } catch (err) {
-        console.error("❌ Detailed Admin Email Error:", err);
-    }
 
-    // Client Confirmation
-    try {
-        await transporter.sendMail({
-            from: `"StudentMeet Team" <${process.env.EMAIL_USER}>`,
+        // Client confirmation
+        await resend.emails.send({
+            from: "StudentMeet <onboarding@resend.dev>",
             to: data.email,
             subject: "StudentMeet - Request Received",
             text: `
 Hello ${data.name},
- 
+
 Your project request has been received.
 Project Title: ${data.projectTitle}
- 
-We will contact you soon.
- 
+
 StudentMeet Team
 `
         });
-        console.log("📧 Client email sent successfully");
-    } catch (err) {
-        console.error("❌ Detailed Client Email Error:", err);
+
+        console.log("✅ Emails sent successfully");
+
+    } catch (error) {
+        console.error("❌ Email sending failed:", error);
     }
 }
-
 /* ===============================
    10. SERVER START
 ================================ */
