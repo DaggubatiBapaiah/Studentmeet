@@ -3,7 +3,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); 0
+const path = require('path');
 const multer = require('multer');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
@@ -243,12 +243,13 @@ app.delete('/api/requests/:id', auth, (req, res) => {
 ================================ */
 
 async function sendEmails(data) {
+    console.log("Client email received:", data.email);
     try {
 
         // Admin email
         await resend.emails.send({
             from: "StudentMeet <onboarding@resend.dev>",
-            to: process.env.ADMIN_EMAIL,
+            to: [process.env.ADMIN_EMAIL],
             subject: "New Project Request",
             text: `
 Name: ${data.name}
@@ -263,7 +264,7 @@ Deadline: ${data.deadline}
         // Client confirmation
         await resend.emails.send({
             from: "StudentMeet <onboarding@resend.dev>",
-            to: data.email,
+            to: [data.email],
             subject: "StudentMeet - Request Received",
             text: `
 Hello ${data.name},
