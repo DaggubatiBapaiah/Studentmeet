@@ -10,44 +10,54 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 1. PROJECT DATA STORAGE (Local File System as Fallback)
-// Since MongoDB is not installed, we use a JSON file to store your requests.
-// This works IMMEDIATELY without needing any extra services!
+/* ===============================
+   1. LOCAL DATABASE SETUP
+================================ */
+
 const DB_FILE = path.join(__dirname, 'database.json');
 const uploadDir = path.join(__dirname, 'uploads');
 
-// Ensure database file and uploads folder exist
 if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify([]));
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-// Helper functions for our "Database"
 const getRequests = () => JSON.parse(fs.readFileSync(DB_FILE));
+
 const saveRequestToLocal = (newReq) => {
     const requests = getRequests();
-    requests.unshift(newReq); // Add to beginning
+    requests.unshift(newReq);
     fs.writeFileSync(DB_FILE, JSON.stringify(requests, null, 2));
 };
 
-// 2. MIDDLEWARE
+/* ===============================
+   2. MIDDLEWARE
+================================ */
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(uploadDir));
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-console.log('✅ Local File Database Ready (database.json)');
+console.log("✅ Local database ready");
 
-// 3. MULTER CONFIG
+/* ===============================
+   3. FILE UPLOAD (MULTER)
+================================ */
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, uploadDir),
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        const unique = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + "-" + unique + path.extname(file.originalname));
     }
 });
+
 const upload = multer({ storage });
 
-// 4. NODEMAILER CONFIG
+/* ===============================
+   4. EMAIL SETUP
+================================ */
+
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -58,31 +68,58 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Auth middleware for Admin
+/* Test Gmail connection */
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("❌ Email server error:", error);
+    } else {
+        console.log("✅ Email server ready");
+    }
+});
+
+/* ===============================
+   5. ADMIN AUTH MIDDLEWARE
+================================ */
+
 const auth = (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) throw new Error();
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
+
         next();
-    } catch (e) {
-        res.status(401).json({ success: false, error: 'Authentication required' });
+
+    } catch {
+        res.status(401).json({
+            success: false,
+            error: "Authentication required"
+        });
     }
 };
 
-/**
- * 5. ROUTES
- */
+/* ===============================
+   6. SUBMIT PROJECT REQUEST
+================================ */
 
-// POST /api/requests - Submit Project Request
 app.post('/api/requests', upload.single('file'), async (req, res) => {
+
     try {
-        console.log('📩 Incoming Request:', req.body);
 
-        const { name, email, whatsapp, projectTitle, projectCategory, projectDescription, budget, deadline } = req.body;
+        console.log("📩 Incoming Request:", req.body);
 
-        // Create the request object
+        const {
+            name,
+            email,
+            whatsapp,
+            projectTitle,
+            projectCategory,
+            projectDescription,
+            budget,
+            deadline
+        } = req.body;
+
         const newRequest = {
             _id: Date.now().toString(),
             name,
@@ -95,16 +132,15 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
             deadline,
             fileName: req.file ? req.file.filename : null,
             fileUrl: req.file ? `/uploads/${req.file.filename}` : null,
-            status: 'pending',
+            status: "pending",
             createdAt: new Date()
         };
 
-        // SAVE TO LOCAL FILE (No MongoDB required!)
         saveRequestToLocal(newRequest);
-        console.log('💾 Successfully saved to local database (database.json)');
 
-        // Background Email Task
-        sendEmails(newRequest).catch(err => console.error('📧 Email Error:', err.message));
+        console.log("💾 Saved to database.json");
+
+        await sendEmails(newRequest);
 
         res.json({
             success: true,
@@ -112,108 +148,174 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
         });
 
     } catch (error) {
-        console.error("API ERROR:", error.message);
+
+        console.error("❌ API Error:", error);
+
         res.status(500).json({
             success: false,
-            message: `Submission Error: ${error.message}`
+            message: error.message
         });
+
     }
+
 });
 
-// Admin Login
+/* ===============================
+   7. ADMIN LOGIN
+================================ */
+
 app.post('/api/admin/login', (req, res) => {
+
     const { username, password } = req.body;
-    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
-        const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        return res.json({ success: true, token });
+
+    if (
+        username === process.env.ADMIN_USERNAME &&
+        password === process.env.ADMIN_PASSWORD
+    ) {
+
+        const token = jwt.sign(
+            { username },
+            process.env.JWT_SECRET,
+            { expiresIn: "24h" }
+        );
+
+        return res.json({
+            success: true,
+            token
+        });
+
     }
-    res.status(401).json({ success: false, error: 'Invalid credentials' });
+
+    res.status(401).json({
+        success: false,
+        error: "Invalid credentials"
+    });
+
 });
 
-// Admin endpoints (Using local file)
-app.get('/api/requests', auth, async (req, res) => {
+/* ===============================
+   8. ADMIN API
+================================ */
+
+app.get('/api/requests', auth, (req, res) => {
     res.json(getRequests());
 });
 
-app.patch('/api/requests/:id', auth, async (req, res) => {
+app.patch('/api/requests/:id', auth, (req, res) => {
+
     const requests = getRequests();
     const index = requests.findIndex(r => r._id === req.params.id);
+
     if (index !== -1) {
+
         requests[index].status = req.body.status;
+
         fs.writeFileSync(DB_FILE, JSON.stringify(requests, null, 2));
-        res.json({ success: true, message: 'Status updated' });
+
+        res.json({
+            success: true,
+            message: "Status updated"
+        });
+
     } else {
-        res.status(404).json({ error: 'Not found' });
+
+        res.status(404).json({ error: "Not found" });
+
     }
+
 });
 
-app.delete('/api/requests/:id', auth, async (req, res) => {
+app.delete('/api/requests/:id', auth, (req, res) => {
+
     const requests = getRequests();
+
     const filtered = requests.filter(r => r._id !== req.params.id);
+
     fs.writeFileSync(DB_FILE, JSON.stringify(filtered, null, 2));
-    res.json({ success: true, message: 'Deleted' });
+
+    res.json({
+        success: true,
+        message: "Deleted"
+    });
+
 });
 
-// Email Helper (Task 1-6)
+/* ===============================
+   9. EMAIL FUNCTION
+================================ */
+
 async function sendEmails(data) {
+
+    console.log("📧 Sending emails...");
+
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.warn('⚠️ Email credentials missing in .env. Skipping notifications.');
+        console.warn("⚠️ Email credentials missing");
         return;
     }
 
-    const adminEmailAddress = 'daggubatibapaiahchowdary@gmail.com';
+    const adminEmail = process.env.EMAIL_USER;
 
-    // 1. Admin Notification Email
-    const adminMailOptions = {
-        from: `"StudentMeet Admin" <${process.env.EMAIL_USER}>`,
-        to: adminEmailAddress,
-        subject: 'New Project Request - StudentMeet',
-        text: `You have received a new project request.
+    try {
 
-Client Name: ${data.name}
+        await transporter.sendMail({
+            from: `"StudentMeet Admin" <${process.env.EMAIL_USER}>`,
+            to: adminEmail,
+            subject: "New Project Request",
+            text: `
+New Project Request
+
+Name: ${data.name}
 Email: ${data.email}
 WhatsApp: ${data.whatsapp}
-Project Title: ${data.projectTitle}
+Project: ${data.projectTitle}
 Budget: ${data.budget}
 Deadline: ${data.deadline}
+`
+        });
 
-View details in the admin dashboard.`
-    };
+        console.log("📧 Admin email sent");
 
-    // 2. Client Confirmation Email
-    const userMailOptions = {
-        from: `"StudentMeet Team" <${process.env.EMAIL_USER}>`,
-        to: data.email,
-        subject: 'StudentMeet - Project Request Received',
-        text: `Hello ${data.name},
+    } catch (err) {
 
-Thank you for submitting your project request on StudentMeet.
+        console.error("❌ Admin email failed:", err);
+
+    }
+
+    try {
+
+        await transporter.sendMail({
+            from: `"StudentMeet Team" <${process.env.EMAIL_USER}>`,
+            to: data.email,
+            subject: "StudentMeet - Request Received",
+            text: `
+Hello ${data.name},
+
+Your project request has been received.
 
 Project Title: ${data.projectTitle}
 
-I will review your request and contact you soon.
+We will contact you soon.
 
-Regards
-StudentMeet`
-    };
+StudentMeet Team
+`
+        });
 
-    try {
-        // Send Admin Email
-        await transporter.sendMail(adminMailOptions);
-        console.log('📧 Admin notification email sent.');
+        console.log("📧 Client email sent");
+
     } catch (err) {
-        console.error('❌ Failed to send Admin email:', err.message);
+
+        console.error("❌ Client email failed:", err);
+
     }
 
-    try {
-        // Send Client Email (Task 2, 4, 5)
-        await transporter.sendMail(userMailOptions);
-        console.log('📧 Client confirmation email sent.');
-    } catch (err) {
-        console.error('❌ Failed to send Client confirmation email:', err.message);
-    }
 }
 
+/* ===============================
+   10. SERVER START
+================================ */
+
 app.listen(PORT, () => {
-    console.log(`🚀 StudentMeet Server: http://localhost:${PORT}`);
+
+    console.log(`🚀 Server running on port ${PORT}`);
+
 });
