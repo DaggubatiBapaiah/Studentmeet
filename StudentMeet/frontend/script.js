@@ -1,4 +1,4 @@
-const API_BASE = "/api";
+const API_BASE = "https://studentmeet.onrender.com/api";
 
 // 0. Mobile Menu Toggle
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
