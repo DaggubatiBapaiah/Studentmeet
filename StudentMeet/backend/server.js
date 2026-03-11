@@ -6,6 +6,16 @@ const multer = require('multer');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const mongoose = require('mongoose');
+
+// Task 7: MongoDB Connection (Non-blocking setup)
+if (process.env.MONGODB_URI) {
+    mongoose.connect(process.env.MONGODB_URI)
+        .then(() => console.log("✅ MongoDB Connected Successfully"))
+        .catch(err => console.error("❌ MongoDB Connection Error:", err));
+}
+
+const RequestModel = require('./models/Request');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -130,8 +140,7 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
             deadline
         } = req.body;
 
-        const newRequest = {
-            _id: Date.now().toString(),
+        const requestData = {
             name,
             email,
             whatsapp,
@@ -146,21 +155,39 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
             createdAt: new Date()
         };
 
-        saveRequestToLocal(newRequest);
+        // 1. Save to Database (Non-blocking)
+        // Check if MongoDB is used, otherwise fall back to local JSON
+        if (mongoose.connection.readyState === 1) {
+            new RequestModel(requestData).save()
+                .then(doc => console.log(`💾 Saved to MongoDB: ${doc._id}`))
+                .catch(err => console.error("❌ MongoDB Save Error:", err));
+        } else {
+            saveRequestToLocal({ _id: Date.now().toString(), ...requestData });
+        }
 
-        await sendEmails(newRequest);
-
+        // 2. Respond immediately to the client (Saves < 100ms)
+        // This PREVENTS the "Request timed out" error on Render.
         res.json({
             success: true,
-            message: "Project request submitted successfully"
+            message: "Project request submitted successfully!"
+        });
+
+        // 3. Process emails in the background (Non-blocking)
+        // Do NOT 'await' this because SMTP delivery can take 2-5 seconds.
+        sendEmails(requestData).catch(err => {
+            console.error("🔥 Background Email Error:", err);
         });
 
     } catch (error) {
         console.error("❌ API Request Processing Error:", error);
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        
+        // Ensure we send a response even if something fails early
+        if (!res.headersSent) {
+            res.status(500).json({
+                success: false,
+                message: "Internal server error. Please try again."
+            });
+        }
     }
 });
 
