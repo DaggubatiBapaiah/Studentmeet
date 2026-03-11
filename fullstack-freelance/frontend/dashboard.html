@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <div class="nav-links">
+            <a href="index.html">Home Site</a>
+            <button id="logoutBtn" class="btn btn-outline border-danger rounded-full" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h2 class="mb-2" style="display: flex; justify-content: space-between; align-items: center;">
+            Project Requests
+            <span id="requestCount" class="status-badge pending" style="font-size: 1rem; padding: 0.5rem 1rem;">Recent Requests</span>
+        </h2>
+        
+        <div id="requestGrid" class="grid grid-3 mt-2">
+            <!-- Project Cards will be injected here by script.js -->
+            <div id="dashboardLoading" class="text-center" style="grid-column: 1 / -1; padding: 4rem;">
+                <p><i class="fas fa-spinner fa-spin"></i> Loading project requests...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--glass-border);">
+        <p>&copy; 2024 DevRequests Admin Panel. Final Pass.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

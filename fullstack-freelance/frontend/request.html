@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Project | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">DevRequests</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="portfolio.html">Portfolio</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="glass-card max-w-600 mx-auto" style="max-width: 650px; margin: 0 auto;">
+            <h2 style="margin-bottom: 1.5rem;">Submit Project Request</h2>
+            <p style="margin-bottom: 2rem;">Fill out the form below and I'll get back to you within 24 hours.</p>
+
+            <form id="projectForm" enctype="multipart/form-data">
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="john@example.com" required>
+                    </div>
+                </div>
+
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>WhatsApp Number</label>
+                        <input type="tel" name="whatsapp" placeholder="+91 12345 67890" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget (INR)</label>
+                        <select name="budget" required>
+                            <option value="" disabled selected>Select Budget Range</option>
+                            <option value="200-500">₹200 - ₹500</option>
+                            <option value="500-1000">₹500 - ₹1000</option>
+                            <option value="1000+">₹1000+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Project Title</label>
+                    <input type="text" name="title" placeholder="e.g. Portfolio Website" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Project Description</label>
+                    <textarea name="description" rows="4" placeholder="Briefly describe what you want built..." required></textarea>
+                </div>
+
+                <div class="grid" style="grid-template-columns: 1.5fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Project File (PDF or Image)</label>
+                        <input type="file" name="file" accept=".pdf,image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="date" name="deadline">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-full" id="submitBtn" style="margin-top: 2rem;">
+                    <i class="fas fa-paper-plane" style="margin-right: 10px;"></i> Submit Request
+                </button>
+
+                <div id="formMessage" style="margin-top: 1.5rem; text-align: center; display: none;"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer style="padding: 4rem 5%; text-align: center; color: var(--text-muted);">
+        <p>&copy; 2024 DevRequests. Admin dashboard available for authorized users.</p>
+    </footer>
+
+    <a href="https://wa.me/911234567890" target="_blank" class="floating-wa">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="script.js"></script>
+</body>
+</html>

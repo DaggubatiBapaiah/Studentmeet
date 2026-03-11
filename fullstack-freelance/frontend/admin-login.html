@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">DevRequests</a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="glass-card max-w-400 mx-auto" style="max-width: 400px; margin: 4rem auto;">
+            <h2 class="text-center">Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="admin" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full mt-2">Log In</button>
+                <p id="loginStatus" class="text-center text-danger mt-2"></p>
+            </form>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        <p>&copy; 2024 DevRequests Admin Portal.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

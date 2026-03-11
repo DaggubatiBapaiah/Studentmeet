@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Sign In | StudentMeet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-login-page">
+    <nav>
+        <a href="index.html" class="logo">Student<span>Meet</span></a>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+    <main class="container flex-center">
+        <div class="glass-card max-w-400 animate">
+            <h2 class="text-center">Welcome Back</h2>
+            <p class="text-center" style="margin-bottom: 2rem; opacity: 0.8;">Sign in to continue your project request</p>
+            
+            <form id="userLoginForm">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="userEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="userName" placeholder="Enter your name" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-full">Continue to Request</button>
+            </form>
+            <p id="userLoginStatus" class="mt-2 text-center"></p>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>

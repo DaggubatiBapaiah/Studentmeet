@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo no-underline">DevRequests</a>
+        <div class="nav-links">
+            <a href="index.html" class="btn-outline btn-small p-05 no-underline rounded-full">Home</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="glass-card animate max-w-400 mx-auto" style="margin-top: 5rem; margin-bottom: 5rem;">
+            <h2 class="text-center mb-2">Admin Login</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail">Email</label>
+                    <input type="email" id="adminEmail" placeholder="admin@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••" required>
+                </div>
+                <div class="mt-2">
+                    <button type="submit" class="btn btn-primary w-full">Login to Dashboard</button>
+                    <div id="loginStatus" class="text-center mt-2 text-danger"></div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        <p>&copy; 2024 DevRequests. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Project | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Meta for SEO -->
+    <meta name="description" content="Submit your project idea and I will build it for you. Project Request Form.">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo no-underline">DevRequests</a>
+        <div class="nav-links">
+            <a href="admin-login.html" class="btn-outline btn-small p-05 no-underline rounded-full">Admin Login</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="glass-card animate max-w-600 mx-auto mt-2 mb-2">
+            <h2 class="text-center mb-2">Request Your Project</h2>
+            <form id="projectRequestForm">
+                <div class="form-group">
+                    <label for="clientName">Full Name</label>
+                    <input type="text" id="clientName" placeholder="Your Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="clientEmail">Email Address</label>
+                    <input type="email" id="clientEmail" placeholder="your@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="clientWhatsApp">WhatsApp Number</label>
+                    <input type="tel" id="clientWhatsApp" placeholder="+1234567890" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectTitle">Project Title</label>
+                    <input type="text" id="projectTitle" placeholder="e.g. E-commerce Platform" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDescription">Project Description</label>
+                    <textarea id="projectDescription" rows="4" placeholder="Tell me more about your idea..." required></textarea>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="projectBudget">Budget ($)</label>
+                        <input type="number" id="projectBudget" placeholder="e.g. 500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectDeadline">Deadline (Optional)</label>
+                        <input type="date" id="projectDeadline">
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <button type="submit" class="btn btn-primary w-full">Submit Project Idea</button>
+                    <div id="submitStatus" class="text-center mt-2"></div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="text-center p-05" style="color: var(--text-muted); padding: 2rem;">
+        <p>&copy; 2024 DevRequests. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase Scripts will be included in script.js -->
+    <script src="script.js" type="module"></script>
+</body>
+</html>

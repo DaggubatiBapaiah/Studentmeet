@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Project | StudentMeet</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">Student<span>Meet</span></a>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="glass-card max-w-600">
+            <h2 style="text-align: left; margin-bottom: 2rem;">Build Your Project</h2>
+            <form id="requestForm" enctype="multipart/form-data">
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" name="name" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Number</label>
+                        <input type="tel" name="whatsapp" placeholder="+91 00000 00000" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="example@mail.com" required>
+                </div>
+
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                         <label>Project Category</label>
+                         <select name="projectCategory" required>
+                             <option value="Software">Software Project</option>
+                             <option value="Hardware/IoT">Hardware / IoT Project</option>
+                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Budget (INR)</label>
+                        <select name="budget" required>
+                            <option value="1000-2000">₹1000 - ₹2000</option>
+                            <option value="2000-5000">₹2000 - ₹5000</option>
+                            <option value="5000-10000">₹5000 - ₹10000</option>
+                            <option value="10000+">₹10000+</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Project Title</label>
+                    <input type="text" name="projectTitle" placeholder="What should we build?" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Project Description</label>
+                    <textarea name="projectDescription" rows="4" placeholder="Tell me more about your project requirements..." required></textarea>
+                </div>
+
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Deadline</label>
+                        <input type="date" name="deadline" required>
+                    </div>
+                    <div class="form-group">
+                        <label>File Upload (PDF/Image)</label>
+                        <input type="file" name="file" accept=".pdf,image/*">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.2rem;" id="submitBtn">
+                    Submit Request
+                </button>
+                <div id="statusMessage" class="mt-2 text-center"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="text-center" style="padding: 4rem 0;">
+        <p>&copy; 2024 StudentMeet. Professional Service Guaranteed.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

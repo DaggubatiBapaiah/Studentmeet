@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "1773223040318",
+    "name": "Daggubati bapaiah chowdary",
+    "email": "babidaggubati13@gmail.com",
+    "whatsapp": "9876543210",
+    "projectTitle": "Python Chatbot for Customer Support",
+    "projectCategory": "Hardware/IoT",
+    "projectDescription": "The StudentMeet backend currently sends email notifications only to the admin.\r\n\r\nFix the email system so that TWO emails are sent after a project request submission.\r\n\r\n1. Admin Notification Email\r\n   Send email to:\r\n   [daggubatibapaiahchowdary@gmail.com](mailto:daggubatibapaiahchowdary@gmail.com)\r\n\r\nSubject:\r\nNew Project Request - StudentMeet\r\n\r\nContent should include:\r\nClient name\r\nEmail\r\nProject title\r\nBudget\r\nDeadline\r\n\r\n2. Client Confirmation Email\r\n   Send email to the user's email address from the form.\r\n\r\nSubject:\r\nStudentMeet - Project Request Received\r\n\r\nEmail content:\r\n\r\nHello [Name],\r\n\r\nThank you for submitting your project request on StudentMeet.\r\n\r\nProject Title: [Project Title]\r\n\r\nI will review your request and contact you soon.\r\n\r\nRegards\r\nStudentMeet\r\n\r\n3. Ensure the email is sent using Nodemailer.\r\n\r\nExample structure:\r\n\r\nawait transporter.sendMail(adminMailOptions);\r\nawait transporter.sendMail(userMailOptions);\r\n\r\n4. Make sure the user email is taken from req.body.email.\r\n\r\n5. Add error logging if the second email fails.\r\n\r\n6. Do not break the API if email fails.\r\n",
+    "budget": "2000-5000",
+    "deadline": "2026-05-05",
+    "fileName": null,
+    "fileUrl": null,
+    "status": "pending",
+    "createdAt": "2026-03-11T09:57:20.318Z"
+  },
+  {
+    "_id": "1773222839855",
+    "name": "Daggubati bapaiah chowdary",
+    "email": "babidaggubati13@gmail.com",
+    "whatsapp": "9885897160",
+    "projectTitle": "Python Chatbot for Customer Support",
+    "projectCategory": "Software",
+    "projectDescription": "The StudentMeet backend currently sends email notifications only to the admin.\r\n\r\nFix the email system so that TWO emails are sent after a project request submission.\r\n\r\n1. Admin Notification Email\r\n   Send email to:\r\n   [daggubatibapaiahchowdary@gmail.com](mailto:daggubatibapaiahchowdary@gmail.com)\r\n\r\nSubject:\r\nNew Project Request - StudentMeet\r\n\r\nContent should include:\r\nClient name\r\nEmail\r\nProject title\r\nBudget\r\nDeadline\r\n\r\n2. Client Confirmation Email\r\n   Send email to the user's email address from the form.\r\n\r\nSubject:\r\nStudentMeet - Project Request Received\r\n\r\nEmail content:\r\n\r\nHello [Name],\r\n\r\nThank you for submitting your project request on StudentMeet.\r\n\r\nProject Title: [Project Title]\r\n\r\nI will review your request and contact you soon.\r\n\r\nRegards\r\nStudentMeet\r\n\r\n3. Ensure the email is sent using Nodemailer.\r\n\r\nExample structure:\r\n\r\nawait transporter.sendMail(adminMailOptions);\r\nawait transporter.sendMail(userMailOptions);\r\n\r\n4. Make sure the user email is taken from req.body.email.\r\n\r\n5. Add error logging if the second email fails.\r\n\r\n6. Do not break the API if email fails.\r\n",
+    "budget": "1000-2000",
+    "deadline": "2026-07-05",
+    "fileName": "file-1773222839835-326117159.pdf",
+    "fileUrl": "/uploads/file-1773222839835-326117159.pdf",
+    "status": "pending",
+    "createdAt": "2026-03-11T09:53:59.855Z"
+  }
+]

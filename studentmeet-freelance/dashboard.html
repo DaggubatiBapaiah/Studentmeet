@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | DevRequests</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="hidden" id="dashboardBody">
+    <nav>
+        <div class="logo">Admin Dashboard</div>
+        <div class="nav-links">
+            <a href="index.html" class="btn-outline btn-small p-05 no-underline rounded-full">Home Site</a>
+            <button id="logoutBtn" class="btn-outline btn-small p-05 no-underline rounded-full border-danger">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h2 class="mb-2 flex-between">
+            Project Requests
+            <span id="requestCount" class="rounded-full p-05 bg-primary">0 Requests</span>
+        </h2>
+        
+        <div id="projectGrid" class="project-grid">
+            <!-- Project Cards will be injected here by JavaScript -->
+            <div id="dashboardLoading" class="text-center p-2">
+                <p>Loading project requests...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted);">
+        <p>&copy; 2024 DevRequests Admin. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html>
