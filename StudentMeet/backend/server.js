@@ -148,7 +148,8 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
 
         saveRequestToLocal(newRequest);
 
-        await sendEmails(newRequest);
+        // Send emails in the background (don't wait for them to finish)
+        sendEmails(newRequest);
 
         res.json({
             success: true,
