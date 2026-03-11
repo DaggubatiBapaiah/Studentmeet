@@ -23,22 +23,38 @@ if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 const getRequests = () => JSON.parse(fs.readFileSync(DB_FILE));
 
 const saveRequestToLocal = (newReq) => {
-    const requests = getRequests();
-    requests.unshift(newReq);
-    fs.writeFileSync(DB_FILE, JSON.stringify(requests, null, 2));
+    try {
+        const requests = getRequests();
+        requests.unshift(newReq);
+        fs.writeFileSync(DB_FILE, JSON.stringify(requests, null, 2));
+        console.log(`💾 Project request saved: ${newReq.projectTitle} (ID: ${newReq._id})`);
+    } catch (error) {
+        console.error("❌ Error saving request to local DB:", error);
+    }
 };
 
 /* ===============================
-   2. MIDDLEWARE
+   2. MIDDLEWARE & LOGGING
 ================================ */
 
-app.use(cors());
+// CORS Configuration
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Request Logger (Production Monitoring)
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] 📥 ${req.method} request received: ${req.url}`);
+    next();
+});
+
 app.use('/uploads', express.static(uploadDir));
 app.use(express.static(path.join(__dirname, '../frontend')));
-
-console.log("✅ Local database ready");
 
 /* ===============================
    3. FILE UPLOAD (MULTER)
@@ -55,7 +71,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* ===============================
-   4. EMAIL SETUP
+   4. EMAIL SETUP (GMAIL SMTP)
 ================================ */
 
 const transporter = nodemailer.createTransport({
@@ -68,12 +84,12 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-/* Test Gmail connection */
+/* Confirm email server connection */
 transporter.verify((error, success) => {
     if (error) {
         console.error("❌ Email server error:", error);
     } else {
-        console.log("✅ Email server ready");
+        console.log("✅ Email server connection confirmed");
     }
 });
 
@@ -88,9 +104,7 @@ const auth = (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
-
         next();
-
     } catch {
         res.status(401).json({
             success: false,
@@ -104,11 +118,7 @@ const auth = (req, res, next) => {
 ================================ */
 
 app.post('/api/requests', upload.single('file'), async (req, res) => {
-
     try {
-
-        console.log("📩 Incoming Request:", req.body);
-
         const {
             name,
             email,
@@ -138,8 +148,6 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
 
         saveRequestToLocal(newRequest);
 
-        console.log("💾 Saved to database.json");
-
         await sendEmails(newRequest);
 
         res.json({
@@ -148,16 +156,12 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
         });
 
     } catch (error) {
-
-        console.error("❌ API Error:", error);
-
+        console.error("❌ API Request Processing Error:", error);
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 });
 
 /* ===============================
@@ -165,32 +169,30 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
 ================================ */
 
 app.post('/api/admin/login', (req, res) => {
-
     const { username, password } = req.body;
 
     if (
         username === process.env.ADMIN_USERNAME &&
         password === process.env.ADMIN_PASSWORD
     ) {
-
         const token = jwt.sign(
             { username },
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
         );
 
+        console.log(`👤 Admin login successful: ${username}`);
         return res.json({
             success: true,
             token
         });
-
     }
 
+    console.warn(`⚠️ Failed login attempt for: ${username}`);
     res.status(401).json({
         success: false,
         error: "Invalid credentials"
     });
-
 });
 
 /* ===============================
@@ -202,42 +204,25 @@ app.get('/api/requests', auth, (req, res) => {
 });
 
 app.patch('/api/requests/:id', auth, (req, res) => {
-
     const requests = getRequests();
     const index = requests.findIndex(r => r._id === req.params.id);
 
     if (index !== -1) {
-
         requests[index].status = req.body.status;
-
         fs.writeFileSync(DB_FILE, JSON.stringify(requests, null, 2));
-
-        res.json({
-            success: true,
-            message: "Status updated"
-        });
-
+        console.log(`🔄 Status for request ${req.params.id} updated to: ${req.body.status}`);
+        res.json({ success: true, message: "Status updated" });
     } else {
-
         res.status(404).json({ error: "Not found" });
-
     }
-
 });
 
 app.delete('/api/requests/:id', auth, (req, res) => {
-
     const requests = getRequests();
-
     const filtered = requests.filter(r => r._id !== req.params.id);
-
     fs.writeFileSync(DB_FILE, JSON.stringify(filtered, null, 2));
-
-    res.json({
-        success: true,
-        message: "Deleted"
-    });
-
+    console.log(`🗑️ Record deleted: ${req.params.id}`);
+    res.json({ success: true, message: "Deleted" });
 });
 
 /* ===============================
@@ -245,9 +230,6 @@ app.delete('/api/requests/:id', auth, (req, res) => {
 ================================ */
 
 async function sendEmails(data) {
-
-    console.log("📧 Sending emails...");
-
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
         console.warn("⚠️ Email credentials missing");
         return;
@@ -255,15 +237,13 @@ async function sendEmails(data) {
 
     const adminEmail = process.env.EMAIL_USER;
 
+    // Admin Notification
     try {
-
         await transporter.sendMail({
             from: `"StudentMeet Admin" <${process.env.EMAIL_USER}>`,
             to: adminEmail,
-            subject: "New Project Request",
+            subject: "New Project Request Received",
             text: `
-New Project Request
-
 Name: ${data.name}
 Email: ${data.email}
 WhatsApp: ${data.whatsapp}
@@ -272,17 +252,13 @@ Budget: ${data.budget}
 Deadline: ${data.deadline}
 `
         });
-
-        console.log("📧 Admin email sent");
-
+        console.log("📧 Admin email sent successfully");
     } catch (err) {
-
-        console.error("❌ Admin email failed:", err);
-
+        console.error("❌ Detailed Admin Email Error:", err);
     }
 
+    // Client Confirmation
     try {
-
         await transporter.sendMail({
             from: `"StudentMeet Team" <${process.env.EMAIL_USER}>`,
             to: data.email,
@@ -291,7 +267,6 @@ Deadline: ${data.deadline}
 Hello ${data.name},
 
 Your project request has been received.
-
 Project Title: ${data.projectTitle}
 
 We will contact you soon.
@@ -299,15 +274,10 @@ We will contact you soon.
 StudentMeet Team
 `
         });
-
-        console.log("📧 Client email sent");
-
+        console.log("📧 Client email sent successfully");
     } catch (err) {
-
-        console.error("❌ Client email failed:", err);
-
+        console.error("❌ Detailed Client Email Error:", err);
     }
-
 }
 
 /* ===============================
@@ -315,7 +285,6 @@ StudentMeet Team
 ================================ */
 
 app.listen(PORT, () => {
-
-    console.log(`🚀 Server running on port ${PORT}`);
-
+    console.log(`🚀 Server starting...`);
+    console.log(`📍 Server running on port ${PORT}`);
 });
