@@ -49,7 +49,9 @@ const upload = multer({ storage });
 
 // 4. NODEMAILER CONFIG
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -77,7 +79,7 @@ const auth = (req, res, next) => {
 app.post('/api/requests', upload.single('file'), async (req, res) => {
     try {
         console.log('📩 Incoming Request:', req.body);
-        
+
         const { name, email, whatsapp, projectTitle, projectCategory, projectDescription, budget, deadline } = req.body;
 
         // Create the request object
