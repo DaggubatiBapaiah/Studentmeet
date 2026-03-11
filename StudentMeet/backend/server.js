@@ -243,7 +243,7 @@ app.delete('/api/requests/:id', auth, (req, res) => {
 ================================ */
 
 async function sendEmails(data) {
-    console.log("Client email received:", data.email);
+    console.log("Sending client email to:", data.email);
     try {
 
         // Admin email
