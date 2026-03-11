@@ -84,22 +84,26 @@ const upload = multer({ storage });
    4. EMAIL SETUP (GMAIL SMTP)
 ================================ */
 
+
+
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
-
 /* Confirm email server connection */
-transporter.verify((error, success) => {
+transporter.verify(function (error, success) {
     if (error) {
-        console.error("❌ Email server error:", error);
+        console.error("SMTP error:", error);
     } else {
-        console.log("✅ Email server connection confirmed");
+        console.log("SMTP server ready to send emails");
     }
 });
 
@@ -180,7 +184,7 @@ app.post('/api/requests', upload.single('file'), async (req, res) => {
 
     } catch (error) {
         console.error("❌ API Request Processing Error:", error);
-        
+
         // Ensure we send a response even if something fails early
         if (!res.headersSent) {
             res.status(500).json({
